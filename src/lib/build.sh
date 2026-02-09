@@ -3,8 +3,6 @@
 WORK_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 LIBRARY_DIR=$WORK_DIR/godot
 
-RELEASE_MODE="MinSizeRel"
-
 REST_ARGS=
 while [[ $# -gt 0 ]]
 do
@@ -17,7 +15,8 @@ case $key in
         shift
         ;;
     --debug)
-        RELEASE_MODE="Debug"
+        DEBUG_INFIX=".dev"
+        SCONS_ENV+=" dev_build=yes"
         shift
         ;;
     *)
@@ -31,16 +30,16 @@ done
 function build_desktop_editor {
     mkdir -p "$BUILD_DIR"
     cd "$LIBRARY_DIR/"
-    scons CC=clang CXX=clang++ library_type=executable compiledb=true
-    cp "$LIBRARY_DIR/bin/"godot*editor* "$BUILD_DIR"
+    scons CC=clang CXX=clang++ library_type=executable compiledb=true $SCONS_ENV
+    cp "$LIBRARY_DIR/bin/"godot*editor$DEBUG_INFIX* "$BUILD_DIR"
 }
 
 function build_desktop_library {
     mkdir -p "$BUILD_DIR"
     cd "$LIBRARY_DIR/"
-    scons CC=clang CXX=clang++ library_type=shared_library compiledb=true
-    cp "$LIBRARY_DIR/bin/"libgodot*editor*.so "$BUILD_DIR"
-    ln -fs "$BUILD_DIR"/libgodot*editor*.so "$BUILD_DIR"/libgodot.so
+    scons CC=clang CXX=clang++ library_type=shared_library compiledb=true $SCONS_ENV
+    cp "$LIBRARY_DIR/bin/"libgodot*editor$DEBUG_INFIX*.so "$BUILD_DIR"
+    ln -fs "$BUILD_DIR"/libgodot*editor$DEBUG_INFIX*.so "$BUILD_DIR"/libgodot.so
 }
 
 function dump_api {

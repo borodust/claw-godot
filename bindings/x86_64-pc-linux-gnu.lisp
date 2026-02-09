@@ -126,11 +126,12 @@
 
 (cffi:defctype %gdext::initialization-function
                (claw-utils:claw-function-prototype-pointer :unsigned-char
-                (claw-utils:claw-function-prototype-pointer
+                                                           (claw-utils:claw-function-prototype-pointer
                  (claw-utils:claw-function-prototype-pointer :void)
                  claw-utils:claw-string)
-                (claw-utils:claw-pointer :void)
-                (claw-utils:claw-pointer (:struct %gdext::initialization)))
+                                                           (claw-utils:claw-pointer :void)
+
+                                                           (claw-utils:claw-pointer (:struct %gdext::initialization)))
                "/home/borodust/devel/repo/pz-godot/src/lib/godot/core/extension/gdextension_interface.gen.h:702:27")
 
 (declaim (inline %gdext::create-godot-instance))
@@ -607,7 +608,7 @@
                "/home/borodust/devel/repo/pz-godot/src/lib/godot/core/extension/gdextension_interface.gen.h:651:3")
 
 (cffi:defctype %gdext::initialize-callback
-               (claw-utils:claw-function-prototype-pointer :void
+    (claw-utils:claw-function-prototype-pointer :void
                 (claw-utils:claw-pointer :void) %gdext::initialization-level)
                "/home/borodust/devel/repo/pz-godot/src/lib/godot/core/extension/gdextension_interface.gen.h:653:16")
 
@@ -2788,4 +2789,3 @@
   (export '%gdext::variant-get-internal-ptr-func :%gdext)
   (export '%gdext::worker-thread-pool-group-task :%gdext)
   (export '%gdext::worker-thread-pool-task :%gdext))
-
