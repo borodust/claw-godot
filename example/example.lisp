@@ -9,26 +9,62 @@
   (:linux "libgodot.so"))
 
 
-(defun init-godot ()
+
+
+(%gdext.common:defprotocallback (level-init-func
+                                 %gdext.types:initialize-callback)
+    (userdata init-level)
+  (declare (ignore userdata))
+  (format *standard-output* "~&Initializing ~A" init-level)
+  (values))
+
+
+(%gdext.common:defprotocallback (level-deinit-func
+                                 %gdext.types:deinitialize-callback)
+    (userdata deinit-level)
+  (declare (ignore userdata))
+  (format *standard-output* "~&Deinitializing ~A" deinit-level)
+  (values))
+
+
+(defun init-godot (init-record-ptr)
   (cffi:with-foreign-object (godot-version '%gdext.types:godot-version2)
     (%gdext.interface:get-godot-version2 godot-version)
-    (cffi:with-foreign-slots (((major %gdext.types::major)
-                               (minor %gdext.types::minor)
-                               (patch %gdext.types::patch))
+    (cffi:with-foreign-slots (((major %gdext.types:major)
+                               (minor %gdext.types:minor)
+                               (patch %gdext.types:patch))
                               godot-version %gdext.types:godot-version2)
       (format *standard-output* "~&Godot version: ~A.~A.~A"
-              major minor patch))))
+              major minor patch)))
+
+  (cffi:with-foreign-slots (((min-init-level %gdext.types:minimum-initialization-level)
+                               (userdata %gdext.types:userdata)
+                               (level-init-func %gdext.types:initialize)
+                               (level-deinit-func %gdext.types:deinitialize))
+                              init-record-ptr %gdext.types:initialization)
+      (setf min-init-level 4
+            userdata (cffi:null-pointer)
+            level-init-func (cffi:callback level-init-func)
+            level-deinit-func (cffi:callback level-deinit-func))))
 
 
 (%gdext.common:defprotocallback (libgodot-init
                                  %gdext.types:initialization-function)
     (get-proc-addr-ptr class-lib-ptr init-record-ptr)
+  (declare (ignore class-lib-ptr))
   (%gdext.common:initialize-interface get-proc-addr-ptr)
-  (init-godot)
+  (init-godot init-record-ptr)
   1)
 
+
 (defun handle-instance (godot-instance)
-  (format *standard-output* "~&Yay! We have an instance: ~A" godot-instance))
+  (format *standard-output* "~&Yay! We have an instance: ~A" godot-instance)
+  (finish-output *standard-output*)
+  (let ((start-bind (%gdext.common::get-method-bind
+                     "GodotInstance" "start" 2240911060)))
+    (%gdext.common::call-method-bind start-bind godot-instance))
+  (finish-output *standard-output*)
+  (sleep 15))
 
 
 (defun run-with-godot-instance ()

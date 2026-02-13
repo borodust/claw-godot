@@ -9,7 +9,8 @@
   :components ((:file "gdext-types")
                (:file "gdext-interface")
                (:file "libgodot")
-               (:file "godot-extensions")))
+               (:file "godot-extensions")
+               (:file "epilogue")))
 
 
 (asdf:defsystem :pz-godot/common
